@@ -88,7 +88,8 @@ export default function ParticleCloud({
   } = useMemo(() => {
     const allVertices: THREE.Vector3[] = [];
 
-    // Traverse scene and extract all vertex positions
+    // Traverse scene and extract vertex positions (sample every Nth vertex for fewer particles)
+    const sampleRate = 8; // Only use every 8th vertex for cleaner look
     scene.updateMatrixWorld(true);
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.geometry) {
@@ -98,7 +99,7 @@ export default function ParticleCloud({
         child.updateMatrixWorld(true);
         const matrix = child.matrixWorld;
 
-        for (let i = 0; i < positionAttr.count; i++) {
+        for (let i = 0; i < positionAttr.count; i += sampleRate) {
           const v = new THREE.Vector3(
             positionAttr.getX(i),
             positionAttr.getY(i),
