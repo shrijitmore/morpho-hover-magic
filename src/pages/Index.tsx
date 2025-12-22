@@ -1,39 +1,46 @@
+import { useState, useEffect, useRef } from 'react';
 import Scene from '@/components/Scene';
+import Header from '@/components/Header';
+import HeroContent from '@/components/HeroContent';
+import ScrollSections from '@/components/ScrollSections';
 
 const Index = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const scrollTop = containerRef.current.scrollTop;
+      const windowHeight = window.innerHeight;
+      // Progress from 0 to 1 over the first viewport height
+      const progress = Math.min(1, scrollTop / windowHeight);
+      setScrollProgress(progress);
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-background">
-      {/* 3D Particle Scene */}
-      <Scene />
-      
-      {/* Content Overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-        <h1 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight mb-4 text-center">
-          Particle Displacement
-        </h1>
-        <p className="text-muted-foreground text-lg md:text-xl text-center max-w-md px-4">
-          Move your cursor over the particles
-        </p>
-      </div>
-      
-      {/* Stats overlay */}
-      <div className="absolute bottom-6 left-6 text-muted-foreground text-sm z-10">
-        <div className="flex gap-8">
-          <div>
-            <p className="text-xs uppercase tracking-wider opacity-60">Source</p>
-            <p className="text-foreground font-mono text-lg">GLB Model</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider opacity-60">Interaction</p>
-            <p className="text-foreground font-mono text-lg">Real-time</p>
-          </div>
-        </div>
-      </div>
-      
-      {/* Instruction */}
-      <div className="absolute bottom-6 right-6 text-muted-foreground text-sm z-10">
-        <p className="text-xs uppercase tracking-wider">Hover to interact</p>
-      </div>
+    <div
+      ref={containerRef}
+      className="relative w-full h-screen overflow-y-auto overflow-x-hidden bg-background scroll-smooth"
+    >
+      {/* Fixed 3D Scene */}
+      <Scene scrollProgress={scrollProgress} />
+
+      {/* Fixed Header */}
+      <Header />
+
+      {/* Hero Content (fades out on scroll) */}
+      <HeroContent scrollProgress={scrollProgress} />
+
+      {/* Scrollable Content Sections */}
+      <ScrollSections scrollProgress={scrollProgress} />
     </div>
   );
 };
