@@ -3,6 +3,7 @@ import Scene from '@/components/Scene';
 import Header from '@/components/Header';
 import HeroContent from '@/components/HeroContent';
 import ScrollSections from '@/components/ScrollSections';
+import FloatingLogos from '@/components/FloatingLogos';
 
 const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -12,9 +13,9 @@ const Index = () => {
     const handleScroll = () => {
       if (!containerRef.current) return;
       const scrollTop = containerRef.current.scrollTop;
-      const windowHeight = window.innerHeight;
-      // Progress from 0 to 1 over the first viewport height
-      const progress = Math.min(1, scrollTop / windowHeight);
+      const scrollHeight = containerRef.current.scrollHeight - window.innerHeight;
+      // Progress from 0 to 1 over total scrollable area
+      const progress = Math.min(1, scrollTop / Math.max(1, scrollHeight));
       setScrollProgress(progress);
     };
 
@@ -38,6 +39,9 @@ const Index = () => {
 
       {/* Hero Content (fades out on scroll) */}
       <HeroContent scrollProgress={scrollProgress} />
+
+      {/* Floating Logos (appear after expansion) */}
+      <FloatingLogos scrollProgress={scrollProgress} />
 
       {/* Scrollable Content Sections */}
       <ScrollSections scrollProgress={scrollProgress} />
