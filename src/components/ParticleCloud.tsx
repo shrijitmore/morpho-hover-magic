@@ -219,73 +219,69 @@ export default function ParticleCloud({
     smoothScroll.current += (scrollProgress - smoothScroll.current) * 0.08;
     const scroll = smoothScroll.current;
     
-    // Smooth mouse interpolation (only active when not expanded)
-    if (scroll < 0.3) {
-      mouseWorld.current.lerp(targetMouse.current, 0.18);
-    } else {
-      mouseWorld.current.lerp(new THREE.Vector3(9999, 9999, 9999), 0.1);
-    }
-    
+    // Smooth mouse interpolation (always track; effect strength is reduced by scrollT below)
+    mouseWorld.current.lerp(targetMouse.current, 0.18);
+
     // Update each particle
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
-      
+
       const ox = originalPositions[i3];
       const oy = originalPositions[i3 + 1];
       const oz = originalPositions[i3 + 2];
-      
+
       const ex = expandedPositions[i3];
       const ey = expandedPositions[i3 + 1];
       const ez = expandedPositions[i3 + 2];
-      
+
       // Interpolate between original and expanded based on scroll
       const scrollT = Math.min(1, scroll * 2); // Full expansion at 50% scroll
       const baseX = ox + (ex - ox) * scrollT;
       const baseY = oy + (ey - oy) * scrollT;
       const baseZ = oz + (ez - oz) * scrollT;
-      
+
       let px = positionAttribute.array[i3] as number;
       let py = positionAttribute.array[i3 + 1] as number;
       let pz = positionAttribute.array[i3 + 2] as number;
-      
-      // Mouse interaction (only when not expanded)
-      let dispX = 0, dispY = 0, dispZ = 0;
-      
-      if (scroll < 0.3) {
-        const dx = px - mouseWorld.current.x;
-        const dy = py - mouseWorld.current.y;
-        const dz = pz - mouseWorld.current.z;
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        
-        const effInteractionRadius = Math.max(0.0001, interactionRadius * boundingSphereRadius);
-        const effDisplacement = displacement * boundingSphereRadius;
-        
-        const influence = Math.max(0, 1 - dist / effInteractionRadius);
-        const smoothInfluence = influence * influence * (3 - 2 * influence);
-        
-        if (dist > 0.001) {
-          const dirX = dx / dist;
-          const dirY = dy / dist;
-          const dirZ = dz / dist;
-          
-          const radialStrength = effDisplacement * smoothInfluence * randomFactors[i];
-          dispX = dirX * radialStrength;
-          dispY = dirY * radialStrength;
-          dispZ = dirZ * radialStrength;
-          
-          const angle = angles[i];
-          const noiseVal = noise3D(ox * 2, oy * 2, time * 0.5);
-          const tangentX = -dirY * Math.cos(angle + noiseVal) + dirZ * Math.sin(angle);
-          const tangentY = dirX * Math.cos(angle + noiseVal) - dirZ * Math.cos(angle);
-          const tangentZ = -dirX * Math.sin(angle) + dirY * Math.cos(angle);
-          
-          const tangentStrength = effDisplacement * 0.3 * smoothInfluence * randomFactors[i];
-          dispX += tangentX * tangentStrength;
-          dispY += tangentY * tangentStrength;
-          dispZ += tangentZ * tangentStrength;
-        }
+
+      // Mouse interaction (strength fades as we expand)
+      let dispX = 0,
+        dispY = 0,
+        dispZ = 0;
+
+      const dx = px - mouseWorld.current.x;
+      const dy = py - mouseWorld.current.y;
+      const dz = pz - mouseWorld.current.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+      const effInteractionRadius = Math.max(0.0001, interactionRadius * boundingSphereRadius);
+      const effDisplacement = displacement * boundingSphereRadius;
+
+      const influence = Math.max(0, 1 - dist / effInteractionRadius);
+      const smoothInfluence = influence * influence * (3 - 2 * influence);
+
+      if (dist > 0.001) {
+        const dirX = dx / dist;
+        const dirY = dy / dist;
+        const dirZ = dz / dist;
+
+        const radialStrength = effDisplacement * smoothInfluence * randomFactors[i];
+        dispX = dirX * radialStrength;
+        dispY = dirY * radialStrength;
+        dispZ = dirZ * radialStrength;
+
+        const angle = angles[i];
+        const noiseVal = noise3D(ox * 2, oy * 2, time * 0.5);
+        const tangentX = -dirY * Math.cos(angle + noiseVal) + dirZ * Math.sin(angle);
+        const tangentY = dirX * Math.cos(angle + noiseVal) - dirZ * Math.cos(angle);
+        const tangentZ = -dirX * Math.sin(angle) + dirY * Math.cos(angle);
+
+        const tangentStrength = effDisplacement * 0.3 * smoothInfluence * randomFactors[i];
+        dispX += tangentX * tangentStrength;
+        dispY += tangentY * tangentStrength;
+        dispZ += tangentZ * tangentStrength;
       }
-      
+
       // Target position
       const targetX = baseX + dispX * (1 - scrollT);
       const targetY = baseY + dispY * (1 - scrollT);
