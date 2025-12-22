@@ -15,10 +15,9 @@ export default function Scene() {
         {/* Subtle ambient lighting */}
         <ambientLight intensity={0.2} />
         
-        {/* Main particle cloud */}
+        {/* Main particle cloud using GLB model */}
         <ParticleCloud
-          particleCount={20000}
-          radius={1.3}
+          modelPath="/models/morph-sphere.glb"
           interactionRadius={0.6}
           displacement={0.35}
         />

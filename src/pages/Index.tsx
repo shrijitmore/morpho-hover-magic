@@ -20,8 +20,8 @@ const Index = () => {
       <div className="absolute bottom-6 left-6 text-muted-foreground text-sm z-10">
         <div className="flex gap-8">
           <div>
-            <p className="text-xs uppercase tracking-wider opacity-60">Particles</p>
-            <p className="text-foreground font-mono text-lg">20,000</p>
+            <p className="text-xs uppercase tracking-wider opacity-60">Source</p>
+            <p className="text-foreground font-mono text-lg">GLB Model</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider opacity-60">Interaction</p>
