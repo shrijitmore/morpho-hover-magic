@@ -345,13 +345,17 @@ export default function ParticleCloud({
   const particleSize = 0.015 + scrollProgress * 0.02;
   
   return (
-    <>
-      {/* Transparent sphere for pointer events (still raycastable by R3F) */}
+    <group>
+      {/* Transparent sphere for pointer events - rotates with particles */}
       <mesh
         ref={hitSphereRef}
         onPointerMove={(e) => {
-          // e.point is in world space; our particles are centered at origin too
-          targetMouse.current.copy(e.point);
+          e.stopPropagation();
+          // Convert world point to local space (accounts for rotation)
+          if (hitSphereRef.current) {
+            const localPoint = hitSphereRef.current.worldToLocal(e.point.clone());
+            targetMouse.current.copy(localPoint);
+          }
         }}
         onPointerOut={() => {
           targetMouse.current.set(9999, 9999, 9999);
@@ -387,7 +391,7 @@ export default function ParticleCloud({
           depthWrite={false}
         />
       </points>
-    </>
+    </group>
   );
 }
 
