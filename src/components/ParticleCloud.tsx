@@ -1,5 +1,6 @@
 import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Simplex noise implementation for smooth organic movement
@@ -50,21 +51,22 @@ function noise3D(x: number, y: number, z: number): number {
 }
 
 interface ParticleCloudProps {
-  particleCount?: number;
-  radius?: number;
   interactionRadius?: number;
   displacement?: number;
+  modelPath?: string;
 }
 
 export default function ParticleCloud({
-  particleCount = 25000,
-  radius = 1.5,
   interactionRadius = 0.5,
-  displacement = 0.4,
+  displacement = 0.35,
+  modelPath = '/models/morph-sphere.glb',
 }: ParticleCloudProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const hitSphereRef = useRef<THREE.Mesh>(null);
   const { camera, gl } = useThree();
+  
+  // Load the GLB model
+  const { scene } = useGLTF(modelPath);
   
   // Mouse state
   const mouse = useRef(new THREE.Vector2(9999, 9999));
@@ -72,44 +74,62 @@ export default function ParticleCloud({
   const targetMouse = useRef(new THREE.Vector3(9999, 9999, 9999));
   const raycaster = useRef(new THREE.Raycaster());
   
-  // Generate initial particle positions on a sphere surface
-  const { positions, originalPositions, velocities, angles, randomFactors } = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    const originalPositions = new Float32Array(particleCount * 3);
-    const velocities = new Float32Array(particleCount * 3);
+  // Extract vertices from GLB model
+  const { positions, originalPositions, velocities, angles, randomFactors, particleCount, boundingSphereRadius } = useMemo(() => {
+    const allVertices: number[] = [];
+    
+    // Traverse scene and extract all vertex positions
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.geometry) {
+        const geometry = child.geometry;
+        const positionAttr = geometry.attributes.position;
+        
+        if (positionAttr) {
+          // Apply the mesh's world matrix to get correct positions
+          child.updateMatrixWorld();
+          const matrix = child.matrixWorld;
+          
+          for (let i = 0; i < positionAttr.count; i++) {
+            const vertex = new THREE.Vector3(
+              positionAttr.getX(i),
+              positionAttr.getY(i),
+              positionAttr.getZ(i)
+            );
+            vertex.applyMatrix4(matrix);
+            
+            allVertices.push(vertex.x, vertex.y, vertex.z);
+          }
+        }
+      }
+    });
+    
+    const particleCount = allVertices.length / 3;
+    console.log(`Extracted ${particleCount} vertices from GLB model`);
+    
+    // Calculate bounding sphere for raycasting
+    let maxDist = 0;
+    for (let i = 0; i < particleCount; i++) {
+      const x = allVertices[i * 3];
+      const y = allVertices[i * 3 + 1];
+      const z = allVertices[i * 3 + 2];
+      const dist = Math.sqrt(x * x + y * y + z * z);
+      if (dist > maxDist) maxDist = dist;
+    }
+    const boundingSphereRadius = maxDist * 1.1;
+    
+    const positions = new Float32Array(allVertices);
+    const originalPositions = new Float32Array(allVertices);
+    const velocities = new Float32Array(particleCount * 3).fill(0);
     const angles = new Float32Array(particleCount);
     const randomFactors = new Float32Array(particleCount);
     
     for (let i = 0; i < particleCount; i++) {
-      // Fibonacci sphere for even distribution
-      const phi = Math.acos(1 - 2 * (i + 0.5) / particleCount);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
-      
-      // Add slight random variation for more organic look
-      const r = radius * (0.9 + Math.random() * 0.2);
-      
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
-      
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-      
-      originalPositions[i * 3] = x;
-      originalPositions[i * 3 + 1] = y;
-      originalPositions[i * 3 + 2] = z;
-      
-      velocities[i * 3] = 0;
-      velocities[i * 3 + 1] = 0;
-      velocities[i * 3 + 2] = 0;
-      
       angles[i] = Math.random() * Math.PI * 2;
       randomFactors[i] = 0.5 + Math.random() * 0.5;
     }
     
-    return { positions, originalPositions, velocities, angles, randomFactors };
-  }, [particleCount, radius]);
+    return { positions, originalPositions, velocities, angles, randomFactors, particleCount, boundingSphereRadius };
+  }, [scene]);
   
   // Handle mouse movement
   useEffect(() => {
@@ -257,7 +277,7 @@ export default function ParticleCloud({
     <>
       {/* Hidden sphere for raycasting */}
       <mesh ref={hitSphereRef} visible={false}>
-        <sphereGeometry args={[radius * 1.2, 32, 32]} />
+        <sphereGeometry args={[boundingSphereRadius, 32, 32]} />
         <meshBasicMaterial />
       </mesh>
       
@@ -290,3 +310,6 @@ export default function ParticleCloud({
     </>
   );
 }
+
+// Preload the model
+useGLTF.preload('/models/morph-sphere.glb');
