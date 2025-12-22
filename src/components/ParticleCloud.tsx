@@ -64,6 +64,7 @@ export default function ParticleCloud({
   modelPath = '/models/morph-sphere.glb',
   scrollProgress = 0,
 }: ParticleCloudProps) {
+  const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const hitSphereRef = useRef<THREE.Mesh>(null);
 
@@ -207,7 +208,7 @@ export default function ParticleCloud({
   
   // Animation frame
   useFrame((state) => {
-    if (!pointsRef.current || !hitSphereRef.current) return;
+    if (!groupRef.current || !pointsRef.current || !hitSphereRef.current) return;
     
     const time = state.clock.elapsedTime;
     const geometry = pointsRef.current.geometry;
@@ -321,9 +322,8 @@ export default function ParticleCloud({
     
     // Slow rotation (slower when expanded)
     const rotationSpeed = 0.03 * (1 - scroll * 0.5);
-    pointsRef.current.rotation.y = time * rotationSpeed;
-    hitSphereRef.current.rotation.y = time * rotationSpeed;
-    
+    groupRef.current.rotation.y = time * rotationSpeed;
+
     // Scale hit sphere based on expansion
     const sphereScale = 1 + scroll * 4;
     hitSphereRef.current.scale.setScalar(sphereScale);
@@ -345,15 +345,15 @@ export default function ParticleCloud({
   const particleSize = 0.015 + scrollProgress * 0.02;
   
   return (
-    <group>
-      {/* Transparent sphere for pointer events - rotates with particles */}
+    <group ref={groupRef}>
+      {/* Transparent sphere for pointer events */}
       <mesh
         ref={hitSphereRef}
         onPointerMove={(e) => {
           e.stopPropagation();
-          // Convert world point to local space (accounts for rotation)
-          if (hitSphereRef.current) {
-            const localPoint = hitSphereRef.current.worldToLocal(e.point.clone());
+          // Convert world point to group-local space (matches particle positions)
+          if (groupRef.current) {
+            const localPoint = groupRef.current.worldToLocal(e.point.clone());
             targetMouse.current.copy(localPoint);
           }
         }}
@@ -364,9 +364,9 @@ export default function ParticleCloud({
         <sphereGeometry args={[boundingSphereRadius, 64, 64]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      
-      {/* Particles */}
-      <points ref={pointsRef}>
+
+      {/* Particles (disable raycast so the invisible sphere reliably receives pointer events) */}
+      <points ref={pointsRef} raycast={() => null}> 
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
