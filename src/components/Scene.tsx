@@ -18,8 +18,8 @@ export default function Scene() {
         {/* Main particle cloud using GLB model */}
         <ParticleCloud
           modelPath="/models/morph-sphere.glb"
-          interactionRadius={0.6}
-          displacement={0.35}
+          interactionRadius={0.35}
+          displacement={0.25}
         />
         
         {/* Disabled orbit controls - enable for debugging */}
