@@ -31,6 +31,7 @@ export default function Scene({ scrollProgress = 0 }: SceneProps) {
           modelPath="/models/morph-sphere.glb"
           interactionRadius={0.35}
           displacement={0.25}
+          scrollProgress={scrollProgress}
         />
         
         {/* Disabled orbit controls */}
