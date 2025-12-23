@@ -29,7 +29,7 @@ export default function Scene({ scrollProgress = 0 }: SceneProps) {
         
         {/* Main particle cloud using GLB model */}
         <ParticleCloud
-          modelPath="/models/morph-sphere.glb"
+          modelPath={import.meta.env.VITE_MODEL_URL || '/models/morph-sphere.glb'}
           interactionRadius={0.35}
           displacement={0.25}
           scrollProgress={scrollProgress}

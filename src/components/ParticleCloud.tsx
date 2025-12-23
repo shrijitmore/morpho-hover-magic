@@ -19,7 +19,7 @@ export default function ParticleCloud({
   // Values are fractions of the model size (bounding sphere radius)
   interactionRadius = 0.35,
   displacement = 0.25,
-  modelPath = '/models/morph-sphere.glb',
+  modelPath = import.meta.env.VITE_MODEL_URL || '/models/morph-sphere.glb',
   scrollProgress = 0,
 }: ParticleCloudProps) {
   const groupRef = useRef<THREE.Group>(null);
@@ -395,4 +395,4 @@ export default function ParticleCloud({
   );
 }
 
-useGLTF.preload('/models/morph-sphere.glb');
+useGLTF.preload(import.meta.env.VITE_MODEL_URL || '/models/morph-sphere.glb');
