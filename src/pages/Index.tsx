@@ -7,30 +7,22 @@ import FloatingLogos from '@/components/FloatingLogos';
 
 const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!containerRef.current) return;
-      const scrollTop = containerRef.current.scrollTop;
-      const scrollHeight = containerRef.current.scrollHeight - window.innerHeight;
-      // Progress from 0 to 1 over total scrollable area
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const progress = Math.min(1, scrollTop / Math.max(1, scrollHeight));
       setScrollProgress(progress);
     };
 
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-screen overflow-y-auto overflow-x-hidden bg-background scroll-smooth"
-    >
+    <div className="relative w-full min-h-screen bg-background">
       {/* Fixed 3D Scene */}
       <Scene scrollProgress={scrollProgress} />
 

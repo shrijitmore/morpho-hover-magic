@@ -3,51 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Simplex noise implementation for smooth organic movement
-const NOISE_SEED = Math.random() * 1000;
-
-function noise3D(x: number, y: number, z: number): number {
-  const X = Math.floor(x) & 255;
-  const Y = Math.floor(y) & 255;
-  const Z = Math.floor(z) & 255;
-  
-  x -= Math.floor(x);
-  y -= Math.floor(y);
-  z -= Math.floor(z);
-  
-  const u = x * x * (3 - 2 * x);
-  const v = y * y * (3 - 2 * y);
-  const w = z * z * (3 - 2 * z);
-  
-  const A = (X + Y * 57 + Z * 131 + NOISE_SEED) * 15731;
-  const B = ((X + 1) + Y * 57 + Z * 131 + NOISE_SEED) * 15731;
-  const C = (X + (Y + 1) * 57 + Z * 131 + NOISE_SEED) * 15731;
-  const D = ((X + 1) + (Y + 1) * 57 + Z * 131 + NOISE_SEED) * 15731;
-  const E = (X + Y * 57 + (Z + 1) * 131 + NOISE_SEED) * 15731;
-  const F = ((X + 1) + Y * 57 + (Z + 1) * 131 + NOISE_SEED) * 15731;
-  const G = (X + (Y + 1) * 57 + (Z + 1) * 131 + NOISE_SEED) * 15731;
-  const H = ((X + 1) + (Y + 1) * 57 + (Z + 1) * 131 + NOISE_SEED) * 15731;
-  
-  const hash = (n: number) => {
-    const h = Math.sin(n) * 43758.5453;
-    return h - Math.floor(h);
-  };
-  
-  const lerp = (a: number, b: number, t: number) => a + t * (b - a);
-  
-  return lerp(
-    lerp(
-      lerp(hash(A), hash(B), u),
-      lerp(hash(C), hash(D), u),
-      v
-    ),
-    lerp(
-      lerp(hash(E), hash(F), u),
-      lerp(hash(G), hash(H), u),
-      v
-    ),
-    w
-  ) * 2 - 1;
+function smoothstep01(t: number) {
+  const x = Math.max(0, Math.min(1, t));
+  return x * x * (3 - 2 * x);
 }
 
 interface ParticleCloudProps {
@@ -68,13 +26,16 @@ export default function ParticleCloud({
   const pointsRef = useRef<THREE.Points>(null);
   const hitSphereRef = useRef<THREE.Mesh>(null);
 
+  // Mouse state (in world space of the particle group)
+  const targetMouseLocal = useRef(new THREE.Vector3(9999, 9999, 9999));
+  const mouseLocal = useRef(new THREE.Vector3(9999, 9999, 9999));
+  const isHovering = useRef(false);
+  const currentRadius = useRef(interactionRadius);
+  const smoothScroll = useRef(0);
+
   // Load the GLB model
   const { scene } = useGLTF(modelPath);
 
-  // Mouse state (in world space of the particle group)
-  const mouseWorld = useRef(new THREE.Vector3(9999, 9999, 9999));
-  const targetMouse = useRef(new THREE.Vector3(9999, 9999, 9999));
-  
   // Extract vertices from GLB model (centered around origin)
   const {
     positions,
@@ -85,7 +46,7 @@ export default function ParticleCloud({
     angles,
     randomFactors,
     particleCount,
-    boundingSphereRadius,
+    radius,
   } = useMemo(() => {
     const allVertices: THREE.Vector3[] = [];
 
@@ -111,17 +72,17 @@ export default function ParticleCloud({
       }
     });
 
-    const particleCount = allVertices.length;
+    const count = allVertices.length;
 
     // Compute centroid and recenter so the cloud sits at (0,0,0)
     const center = new THREE.Vector3();
     for (const v of allVertices) center.add(v);
-    if (particleCount > 0) center.multiplyScalar(1 / particleCount);
+    if (count > 0) center.multiplyScalar(1 / count);
 
     let maxDist = 0;
-    const flat = new Float32Array(particleCount * 3);
+    const flat = new Float32Array(count * 3);
 
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < count; i++) {
       const v = allVertices[i].clone().sub(center);
       flat[i * 3] = v.x;
       flat[i * 3 + 1] = v.y;
@@ -129,19 +90,19 @@ export default function ParticleCloud({
       maxDist = Math.max(maxDist, v.length());
     }
 
-    const boundingSphereRadius = maxDist * 1.15;
+    const r = maxDist * 1.15;
 
-    const positions = new Float32Array(flat);
-    const originalPositions = new Float32Array(flat);
-    const velocities = new Float32Array(particleCount * 3).fill(0);
-    const angles = new Float32Array(particleCount);
-    const randomFactors = new Float32Array(particleCount);
+    const positionsArr = new Float32Array(flat);
+    const originalPositionsArr = new Float32Array(flat);
+    const velocitiesArr = new Float32Array(count * 3).fill(0);
+    const anglesArr = new Float32Array(count);
+    const randomFactorsArr = new Float32Array(count);
     
     // Generate expanded positions (scattered outward for scroll effect)
-    const expandedPositions = new Float32Array(particleCount * 3);
+    const expandedPositionsArr = new Float32Array(count * 3);
     
     // Generate random colors for expanded state (colorful dots like morpho)
-    const expandedColors = new Float32Array(particleCount * 3);
+    const expandedColorsArr = new Float32Array(count * 3);
     const colorPalette = [
       { h: 0.55, s: 0.9, l: 0.6 },   // Cyan
       { h: 0.33, s: 0.8, l: 0.5 },   // Green
@@ -153,9 +114,9 @@ export default function ParticleCloud({
       { h: 0, s: 0, l: 0.9 },        // White
     ];
 
-    for (let i = 0; i < particleCount; i++) {
-      angles[i] = Math.random() * Math.PI * 2;
-      randomFactors[i] = 0.5 + Math.random() * 0.5;
+    for (let i = 0; i < count; i++) {
+      anglesArr[i] = Math.random() * Math.PI * 2;
+      randomFactorsArr[i] = 0.5 + Math.random() * 0.5;
       
       // Calculate expanded position (spread outward radially)
       const ox = flat[i * 3];
@@ -167,13 +128,13 @@ export default function ParticleCloud({
       const expandFactor = 3 + Math.random() * 4; // 3x to 7x expansion
       
       if (len > 0.001) {
-        expandedPositions[i * 3] = (ox / len) * len * expandFactor + (Math.random() - 0.5) * 2;
-        expandedPositions[i * 3 + 1] = (oy / len) * len * expandFactor + (Math.random() - 0.5) * 2;
-        expandedPositions[i * 3 + 2] = (oz / len) * len * expandFactor + (Math.random() - 0.5) * 1;
+        expandedPositionsArr[i * 3] = (ox / len) * len * expandFactor + (Math.random() - 0.5) * 2;
+        expandedPositionsArr[i * 3 + 1] = (oy / len) * len * expandFactor + (Math.random() - 0.5) * 2;
+        expandedPositionsArr[i * 3 + 2] = (oz / len) * len * expandFactor + (Math.random() - 0.5) * 1;
       } else {
-        expandedPositions[i * 3] = ox;
-        expandedPositions[i * 3 + 1] = oy;
-        expandedPositions[i * 3 + 2] = oz;
+        expandedPositionsArr[i * 3] = ox;
+        expandedPositionsArr[i * 3 + 1] = oy;
+        expandedPositionsArr[i * 3 + 2] = oz;
       }
       
       // Assign colors - mostly white/cyan, some colorful accents
@@ -184,45 +145,71 @@ export default function ParticleCloud({
       
       const col = colorPalette[colorIdx];
       const color = new THREE.Color().setHSL(col.h, col.s, col.l);
-      expandedColors[i * 3] = color.r;
-      expandedColors[i * 3 + 1] = color.g;
-      expandedColors[i * 3 + 2] = color.b;
+      expandedColorsArr[i * 3] = color.r;
+      expandedColorsArr[i * 3 + 1] = color.g;
+      expandedColorsArr[i * 3 + 2] = color.b;
     }
 
     return {
-      positions,
-      originalPositions,
-      expandedPositions,
-      expandedColors,
-      velocities,
-      angles,
-      randomFactors,
-      particleCount,
-      boundingSphereRadius,
+      positions: positionsArr,
+      originalPositions: originalPositionsArr,
+      expandedPositions: expandedPositionsArr,
+      expandedColors: expandedColorsArr,
+      velocities: velocitiesArr,
+      angles: anglesArr,
+      randomFactors: randomFactorsArr,
+      particleCount: count,
+      radius: r,
     };
   }, [scene]);
-  
 
-  // Smoothed scroll value for animation
-  const smoothScroll = useRef(0);
-  
   // Animation frame
-  useFrame((state) => {
-    if (!groupRef.current || !pointsRef.current || !hitSphereRef.current) return;
-    
-    const time = state.clock.elapsedTime;
-    const geometry = pointsRef.current.geometry;
+  useFrame((state, dt) => {
+    const points = pointsRef.current;
+    const hitSphere = hitSphereRef.current;
+    const group = groupRef.current;
+    if (!points || !hitSphere || !group) return;
+
+    const t = state.clock.elapsedTime;
+    const geometry = points.geometry;
     const positionAttribute = geometry.attributes.position as THREE.BufferAttribute;
     const colorAttribute = geometry.attributes.color as THREE.BufferAttribute;
-    
-    // Smooth the scroll progress
-    smoothScroll.current += (scrollProgress - smoothScroll.current) * 0.08;
-    const scroll = smoothScroll.current;
-    
-    // Smooth mouse interpolation (always track; effect strength is reduced by scrollT below)
-    mouseWorld.current.lerp(targetMouse.current, 0.18);
 
-    // Update each particle
+    // Smooth the scroll progress
+    const scrollLerp = 1 - Math.exp(-dt * 10);
+    smoothScroll.current += (scrollProgress - smoothScroll.current) * scrollLerp;
+    const scroll = smoothScroll.current;
+
+    // Interpolate between original and expanded based on scroll
+    const scrollT = Math.min(1, scroll * 2); // Full expansion at 50% scroll
+    
+    // Frame-rate independent smoothing (mouse)
+    const mouseLerp = 1 - Math.exp(-dt * 28);
+    mouseLocal.current.lerp(targetMouseLocal.current, mouseLerp);
+
+    // Smoothly increase radius when hovering
+    const targetRadius = isHovering.current ? interactionRadius * 1.8 : interactionRadius;
+    const radiusLerp = 1 - Math.exp(-dt * 8);
+    currentRadius.current += (targetRadius - currentRadius.current) * radiusLerp;
+
+    const effInteractionRadius = Math.max(0.0001, currentRadius.current * radius);
+    const effDisplacement = displacement * radius;
+
+    // Colors
+    const bc = new THREE.Color().setHSL(0.55, 0.9, 0.6);
+    const hc = new THREE.Color().setHSL(0.77, 0.7, 0.6);
+    const baseR = bc.r, baseG = bc.g, baseB = bc.b;
+    const hoverR = hc.r, hoverG = hc.g, hoverB = hc.b;
+
+    // "Sand" motion physics (exactly like Threejs version)
+    const force = effDisplacement * 3.2;
+    const friction = Math.exp(-dt * 18);
+    const settle = Math.exp(-dt * 6);
+    const maxSpeed = effDisplacement * 0.9;
+
+    const posArr = positionAttribute.array as Float32Array;
+    const colArr = colorAttribute.array as Float32Array;
+
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
 
@@ -234,107 +221,116 @@ export default function ParticleCloud({
       const ey = expandedPositions[i3 + 1];
       const ez = expandedPositions[i3 + 2];
 
-      // Interpolate between original and expanded based on scroll
-      const scrollT = Math.min(1, scroll * 2); // Full expansion at 50% scroll
+      // Current base position based on scroll
       const baseX = ox + (ex - ox) * scrollT;
       const baseY = oy + (ey - oy) * scrollT;
       const baseZ = oz + (ez - oz) * scrollT;
 
-      let px = positionAttribute.array[i3] as number;
-      let py = positionAttribute.array[i3 + 1] as number;
-      let pz = positionAttribute.array[i3 + 2] as number;
+      const px = posArr[i3];
+      const py = posArr[i3 + 1];
+      const pz = posArr[i3 + 2];
 
-      // Mouse interaction (strength fades as we expand)
-      let dispX = 0,
-        dispY = 0,
-        dispZ = 0;
-
-      const dx = px - mouseWorld.current.x;
-      const dy = py - mouseWorld.current.y;
-      const dz = pz - mouseWorld.current.z;
+      const dx = px - mouseLocal.current.x;
+      const dy = py - mouseLocal.current.y;
+      const dz = pz - mouseLocal.current.z;
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-      const effInteractionRadius = Math.max(0.0001, interactionRadius * boundingSphereRadius);
-      const effDisplacement = displacement * boundingSphereRadius;
+      const influence = 1 - dist / effInteractionRadius;
+      const s = smoothstep01(influence);
 
-      const influence = Math.max(0, 1 - dist / effInteractionRadius);
-      const smoothInfluence = influence * influence * (3 - 2 * influence);
+      let fx = 0, fy = 0, fz = 0;
 
-      if (dist > 0.001) {
-        const dirX = dx / dist;
-        const dirY = dy / dist;
-        const dirZ = dz / dist;
+      // Only apply hover forces if not scrolling
+      const hoverEnabled = scrollT < 0.05;
+      
+      if (hoverEnabled && dist > 0.0001 && s > 0) {
+        const inv = 1 / dist;
+        const dirX = dx * inv;
+        const dirY = dy * inv;
+        const dirZ = dz * inv
 
-        const radialStrength = effDisplacement * smoothInfluence * randomFactors[i];
-        dispX = dirX * radialStrength;
-        dispY = dirY * radialStrength;
-        dispZ = dirZ * radialStrength;
+        // Repel away from cursor (short-range)
+        const repel = force * s * randomFactors[i];
+        fx += dirX * repel;
+        fy += dirY * repel;
+        fz += dirZ * repel;
 
+        // Tangential drift (gives "sand flow" feel)
         const angle = angles[i];
-        const noiseVal = noise3D(ox * 2, oy * 2, time * 0.5);
-        const tangentX = -dirY * Math.cos(angle + noiseVal) + dirZ * Math.sin(angle);
-        const tangentY = dirX * Math.cos(angle + noiseVal) - dirZ * Math.cos(angle);
-        const tangentZ = -dirX * Math.sin(angle) + dirY * Math.cos(angle);
+        const wobble = Math.sin(t * 1.2 + angle) * 0.35;
+        const tanX = -dirY;
+        const tanY = dirX;
+        const tanZ = dirZ * 0.2;
+        const tanLen = Math.sqrt(tanX * tanX + tanY * tanY + tanZ * tanZ) || 1;
+        const tx = tanX / tanLen;
+        const ty = tanY / tanLen;
+        const tz = tanZ / tanLen;
 
-        const tangentStrength = effDisplacement * 0.3 * smoothInfluence * randomFactors[i];
-        dispX += tangentX * tangentStrength;
-        dispY += tangentY * tangentStrength;
-        dispZ += tangentZ * tangentStrength;
+        const drift = force * 0.22 * s * randomFactors[i] * wobble;
+        fx += tx * drift;
+        fy += ty * drift;
+        fz += tz * drift;
       }
 
-      // Target position
-      const targetX = baseX + dispX * (1 - scrollT);
-      const targetY = baseY + dispY * (1 - scrollT);
-      const targetZ = baseZ + dispZ * (1 - scrollT);
+      // Integrate velocity (overdamped)
+      velocities[i3] = (velocities[i3] + fx * dt) * friction;
+      velocities[i3 + 1] = (velocities[i3 + 1] + fy * dt) * friction;
+      velocities[i3 + 2] = (velocities[i3 + 2] + fz * dt) * friction;
+
+      // Clamp speed
+      const vx = velocities[i3];
+      const vy = velocities[i3 + 1];
+      const vz = velocities[i3 + 2];
+      const vLen = Math.sqrt(vx * vx + vy * vy + vz * vz);
+      if (vLen > maxSpeed) {
+        const k = maxSpeed / vLen;
+        velocities[i3] *= k;
+        velocities[i3 + 1] *= k;
+        velocities[i3 + 2] *= k;
+      }
+
+      // Apply velocity
+      posArr[i3] = px + velocities[i3];
+      posArr[i3 + 1] = py + velocities[i3 + 1];
+      posArr[i3 + 2] = pz + velocities[i3 + 2];
+
+      // Slow settling back to base position
+      posArr[i3] = baseX + (posArr[i3] - baseX) * settle;
+      posArr[i3 + 1] = baseY + (posArr[i3 + 1] - baseY) * settle;
+      posArr[i3 + 2] = baseZ + (posArr[i3 + 2] - baseZ) * settle;
+
+      // Color interpolation: base/hover -> expanded colors
+      const hoverInfluence = hoverEnabled ? s : 0;
+      const currentBaseColor = new THREE.Color(baseR, baseG, baseB).lerp(new THREE.Color(hoverR, hoverG, hoverB), hoverInfluence);
+      const expColor = new THREE.Color(expandedColors[i3], expandedColors[i3 + 1], expandedColors[i3 + 2]);
+      const finalColor = currentBaseColor.lerp(expColor, scrollT);
       
-      // Velocity-based smooth animation
-      const stiffness = 0.06;
-      const damping = 0.88;
-      
-      velocities[i3] = (velocities[i3] + (targetX - px) * stiffness) * damping;
-      velocities[i3 + 1] = (velocities[i3 + 1] + (targetY - py) * stiffness) * damping;
-      velocities[i3 + 2] = (velocities[i3 + 2] + (targetZ - pz) * stiffness) * damping;
-      
-      (positionAttribute.array as Float32Array)[i3] = px + velocities[i3];
-      (positionAttribute.array as Float32Array)[i3 + 1] = py + velocities[i3 + 1];
-      (positionAttribute.array as Float32Array)[i3 + 2] = pz + velocities[i3 + 2];
-      
-      // Interpolate colors: cyan -> colorful expanded colors
-      const baseColor = new THREE.Color().setHSL(0.55, 0.9, 0.6);
-      const expColor = new THREE.Color(
-        expandedColors[i3],
-        expandedColors[i3 + 1],
-        expandedColors[i3 + 2]
-      );
-      const finalColor = baseColor.clone().lerp(expColor, scrollT);
-      
-      (colorAttribute.array as Float32Array)[i3] = finalColor.r;
-      (colorAttribute.array as Float32Array)[i3 + 1] = finalColor.g;
-      (colorAttribute.array as Float32Array)[i3 + 2] = finalColor.b;
+      colArr[i3] = finalColor.r;
+      colArr[i3 + 1] = finalColor.g;
+      colArr[i3 + 2] = finalColor.b;
     }
-    
+
     positionAttribute.needsUpdate = true;
     colorAttribute.needsUpdate = true;
     
     // Slow rotation (slower when expanded)
     const rotationSpeed = 0.03 * (1 - scroll * 0.5);
-    groupRef.current.rotation.y = time * rotationSpeed;
+    groupRef.current.rotation.y = t * rotationSpeed;
 
     // Scale hit sphere based on expansion
-    const sphereScale = 1 + scroll * 4;
-    hitSphereRef.current.scale.setScalar(sphereScale);
+    hitSphereRef.current.scale.setScalar(1 + scroll * 4);
   });
   
-  // Initialize color attribute
+  // Initialize colors
   const colors = useMemo(() => {
-    const colors = new Float32Array(particleCount * 3);
+    const out = new Float32Array(particleCount * 3);
+    const color = new THREE.Color().setHSL(0.55, 0.9, 0.6);
     for (let i = 0; i < particleCount; i++) {
-      const color = new THREE.Color().setHSL(0.55, 0.9, 0.6);
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
+      out[i * 3] = color.r;
+      out[i * 3 + 1] = color.g;
+      out[i * 3 + 2] = color.b;
     }
-    return colors;
+    return out;
   }, [particleCount]);
   
   // Dynamic particle size based on scroll
@@ -342,26 +338,34 @@ export default function ParticleCloud({
   
   return (
     <group ref={groupRef}>
-      {/* Transparent sphere for pointer events */}
+      {/* Invisible hit surface for pointer events (Matches Threejs version exactly) */}
       <mesh
         ref={hitSphereRef}
         onPointerMove={(e) => {
-          e.stopPropagation();
-          // Convert world point to group-local space (matches particle positions)
-          if (groupRef.current) {
-            const localPoint = groupRef.current.worldToLocal(e.point.clone());
-            targetMouse.current.copy(localPoint);
+          // Disable hover detection when scrolled down
+          if (scrollProgress > 0.05) {
+            isHovering.current = false;
+            targetMouseLocal.current.set(9999, 9999, 9999);
+            return;
           }
+          
+          if (!groupRef.current) return;
+          const p = e.point.clone();
+          groupRef.current.worldToLocal(p);
+          targetMouseLocal.current.copy(p);
+          // Snap immediately on actual pointer events to remove the "detection delay"
+          mouseLocal.current.copy(p);
+          isHovering.current = true;
         }}
         onPointerOut={() => {
-          targetMouse.current.set(9999, 9999, 9999);
+          targetMouseLocal.current.set(9999, 9999, 9999);
+          isHovering.current = false;
         }}
       >
-        <sphereGeometry args={[boundingSphereRadius, 64, 64]} />
+        <sphereGeometry args={[radius, 64, 64]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
-      {/* Particles (disable raycast so the invisible sphere reliably receives pointer events) */}
       <points ref={pointsRef} raycast={() => null}> 
         <bufferGeometry>
           <bufferAttribute
@@ -391,5 +395,4 @@ export default function ParticleCloud({
   );
 }
 
-// Preload the model
 useGLTF.preload('/models/morph-sphere.glb');

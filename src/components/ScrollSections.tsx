@@ -11,7 +11,7 @@ interface ScrollSectionsProps {
 
 export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) {
   return (
-    <div className="relative z-20 pt-[100vh]">
+    <div className="relative z-20 pt-[100vh] pointer-events-none">
       {/* Section 1 */}
       <motion.section
         initial="hidden"
@@ -19,7 +19,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
       >
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">
@@ -38,7 +38,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8, delay: 0.1 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
       >
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-accent text-sm uppercase tracking-wider mb-4">Built for scale</p>
@@ -59,7 +59,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.8, delay: 0.1 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -143,7 +143,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8 }}
         variants={fadeInUp}
-        className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24"
+        className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
       >
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">

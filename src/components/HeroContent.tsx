@@ -10,7 +10,7 @@ export default function HeroContent({ scrollProgress = 0 }: HeroContentProps) {
 
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10"
+      className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-10"
       style={{ opacity }}
     >
       {/* Main headline */}

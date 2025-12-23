@@ -12,11 +12,12 @@ export default function Scene({ scrollProgress = 0 }: SceneProps) {
   const cameraZ = 4 + scrollProgress * 2;
 
   return (
-    <div className="fixed inset-0 w-full h-full">
+    <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, cameraZ], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
+        style={{ pointerEvents: 'auto' }}
       >
         <color attach="background" args={['hsl(220, 20%, 4%)']} />
         
