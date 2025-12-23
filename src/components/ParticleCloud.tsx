@@ -25,6 +25,11 @@ export default function ParticleCloud({
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const hitSphereRef = useRef<THREE.Mesh>(null);
+  const pointsMaterialRef = useRef<THREE.PointsMaterial>(null);
+
+  // Animation state for entry
+  const entryAnimation = useRef({ progress: 0, started: false });
+  const startTime = useRef<number | null>(null);
 
   // Mouse state (in world space of the particle group)
   const targetMouseLocal = useRef(new THREE.Vector3(9999, 9999, 9999));
@@ -168,13 +173,39 @@ export default function ParticleCloud({
     const points = pointsRef.current;
     const hitSphere = hitSphereRef.current;
     const group = groupRef.current;
-    if (!points || !hitSphere || !group) return;
+    const pointsMaterial = pointsMaterialRef.current;
+    if (!points || !hitSphere || !group || !pointsMaterial) return;
 
     const t = state.clock.elapsedTime;
     const geometry = points.geometry;
     const positionAttribute = geometry.attributes.position as THREE.BufferAttribute;
     const colorAttribute = geometry.attributes.color as THREE.BufferAttribute;
 
+    // Entry animation (subtle fade in and scale up)
+    if (!entryAnimation.current.started) {
+      entryAnimation.current.started = true;
+      startTime.current = t;
+    }
+    
+    const entryDelay = 0.2; // Start slightly after page load
+    const entryDuration = 1.2; // Faster entry
+    const entryElapsed = startTime.current !== null ? Math.max(0, t - startTime.current - entryDelay) : 0;
+    const entryProgress = Math.min(1, entryElapsed / entryDuration);
+    
+    // Smooth easing (similar to text animations)
+    const easedProgress = entryProgress * entryProgress * (3 - 2 * entryProgress);
+    
+    // Apply entry animation: scale and opacity
+    const entryScale = 0.95 + (1 - 0.95) * easedProgress;
+    const entryOpacity = easedProgress;
+    group.scale.setScalar(entryScale);
+    pointsMaterial.opacity = 0.9 * entryOpacity; // Animate from 0 to 0.9
+
+    // Sand effect constants
+    const fallHeight = radius * 5;
+    const spreadWidth = radius * 2;
+    const entryActive = entryProgress < 1;
+    
     // Smooth the scroll progress
     const scrollLerp = 1 - Math.exp(-dt * 10);
     smoothScroll.current += (scrollProgress - smoothScroll.current) * scrollLerp;
@@ -222,9 +253,25 @@ export default function ParticleCloud({
       const ez = expandedPositions[i3 + 2];
 
       // Current base position based on scroll
-      const baseX = ox + (ex - ox) * scrollT;
-      const baseY = oy + (ey - oy) * scrollT;
-      const baseZ = oz + (ez - oz) * scrollT;
+      let baseX = ox + (ex - ox) * scrollT;
+      let baseY = oy + (ey - oy) * scrollT;
+      let baseZ = oz + (ez - oz) * scrollT;
+
+      // Apply "Sand" entry effect
+      if (entryActive) {
+        // Individual progress with randomized delay/offset
+        const individualDelay = randomFactors[i] * 0.3;
+        const p = Math.max(0, Math.min(1, (entryProgress - individualDelay) / (1 - 0.3)));
+        const ep = p * p * (3 - 2 * p); // Local ease
+
+        const yOffset = (1 - ep) * fallHeight * (1 + randomFactors[i]);
+        const xOffset = (1 - ep) * (randomFactors[i] - 0.5) * spreadWidth;
+        const zOffset = (1 - ep) * (randomFactors[(i + 1) % particleCount] - 0.5) * spreadWidth;
+
+        baseX += xOffset;
+        baseY += yOffset;
+        baseZ += zOffset;
+      }
 
       const px = posArr[i3];
       const py = posArr[i3 + 1];
@@ -382,10 +429,11 @@ export default function ParticleCloud({
           />
         </bufferGeometry>
         <pointsMaterial
+          ref={pointsMaterialRef}
           size={particleSize}
           vertexColors
           transparent
-          opacity={0.9}
+          opacity={0}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}
