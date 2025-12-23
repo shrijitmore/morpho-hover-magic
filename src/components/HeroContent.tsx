@@ -18,11 +18,11 @@ export default function HeroContent({ scrollProgress = 0 }: HeroContentProps) {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground tracking-tight mb-4 text-center px-4"
+        className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tighter mb-6 text-center px-4"
       >
-        Connect to the universal
+        We build the digital
         <br />
-        lending network
+        products of tomorrow
       </motion.h1>
 
       {/* Subtitle */}
@@ -30,11 +30,10 @@ export default function HeroContent({ scrollProgress = 0 }: HeroContentProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-        className="text-muted-foreground text-base md:text-lg text-center max-w-lg px-4 mb-8"
+        className="text-muted-foreground text-lg md:text-xl text-center max-w-2xl px-4 mb-12 leading-relaxed"
       >
-        Access global liquidity at the best possible terms
-        <br />
-        powered by open infrastructure that serves, not extracts.
+        Nova Dev is a freelance agency specializing in high-performance
+        <br className="hidden md:block" /> web applications and custom mobile experiences.
       </motion.p>
 
       {/* Stats */}
@@ -42,15 +41,15 @@ export default function HeroContent({ scrollProgress = 0 }: HeroContentProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
-        className="absolute bottom-8 left-8 flex gap-12"
+        className="absolute bottom-12 left-12 flex gap-16"
       >
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Deposits</p>
-          <p className="text-foreground font-mono text-xl md:text-2xl">$9,048,087,077</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2 font-bold">Launched</p>
+          <p className="text-foreground font-mono text-2xl md:text-3xl">42+</p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Loans</p>
-          <p className="text-foreground font-mono text-xl md:text-2xl">$3,247,443,178</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2 font-bold">Satisfaction</p>
+          <p className="text-foreground font-mono text-2xl md:text-3xl">100%</p>
         </div>
       </motion.div>
 

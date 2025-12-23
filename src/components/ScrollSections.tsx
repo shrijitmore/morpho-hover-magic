@@ -19,14 +19,15 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto snap-section"
       >
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">
-            Powered by Morpho
+          <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 tracking-tighter">
+            Web Engineering
           </h2>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
-            Enterprises connect with Morpho to power any lending or borrowing use case at scale.
+          <p className="text-muted-foreground text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed">
+            From high-performance React applications to complex enterprise systems, 
+            we build web experiences that are fast, secure, and infinitely scalable.
           </p>
         </div>
       </motion.section>
@@ -38,16 +39,16 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8, delay: 0.1 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto snap-section"
       >
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-accent text-sm uppercase tracking-wider mb-4">Built for scale</p>
-          <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">
-            Enterprise-grade infrastructure
+          <p className="text-primary text-sm uppercase tracking-[0.3em] mb-6 font-bold">Native & Cross-Platform</p>
+          <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 tracking-tighter">
+            App Development
           </h2>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
-            Launch in weeks, not months. Our infrastructure handles billions in daily volume with
-            enterprise security and reliability.
+          <p className="text-muted-foreground text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed">
+            We transform ideas into premium iOS and Android applications. 
+            Focused on intuitive UX and robust performance that keeps users coming back.
           </p>
         </div>
       </motion.section>
@@ -59,29 +60,29 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.8, delay: 0.1 }}
         variants={fadeInUp}
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
+        className="min-h-screen flex flex-col items-center justify-center px-6 py-24 pointer-events-auto snap-section"
       >
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">
-              Solutions for every use case
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 tracking-tighter">
+              Full-Stack Solutions
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8"
+              className="bg-card/30 backdrop-blur-xl border border-white/5 rounded-3xl p-10 hover:border-primary/30 transition-colors"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Embed custom earn products
+              <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">
+                UI/UX Strategy
               </h3>
-              <p className="text-muted-foreground">
-                Give your users access to yield on any asset and across any risk profile or
-                compliance requirements.
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                User-centric design combined with strategic business goals to create 
+                interfaces that convert and delight.
               </p>
             </motion.div>
 
@@ -90,14 +91,14 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8"
+              className="bg-card/30 backdrop-blur-xl border border-white/5 rounded-3xl p-10 hover:border-primary/30 transition-colors"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Launch credit products
+              <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">
+                Scalable Architecture
               </h3>
-              <p className="text-muted-foreground">
-                Enable your users to borrow against their assets with flexible terms and
-                competitive rates.
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Cloud-native backend systems designed to handle millions of requests 
+                while maintaining maximum uptime.
               </p>
             </motion.div>
 
@@ -106,14 +107,14 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8"
+              className="bg-card/30 backdrop-blur-xl border border-white/5 rounded-3xl p-10 hover:border-primary/30 transition-colors"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Build DeFi protocols
+              <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">
+                API Integration
               </h3>
-              <p className="text-muted-foreground">
-                Leverage our battle-tested smart contracts to build new financial primitives
-                and protocols.
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Seamlessly connecting your product with third-party services, payment 
+                gateways, and legacy systems.
               </p>
             </motion.div>
 
@@ -122,14 +123,14 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8"
+              className="bg-card/30 backdrop-blur-xl border border-white/5 rounded-3xl p-10 hover:border-primary/30 transition-colors"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Institutional solutions
+              <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">
+                Ongoing Support
               </h3>
-              <p className="text-muted-foreground">
-                Custom integrations and dedicated support for institutions managing significant
-                capital.
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                We don't just launch and leave. We provide continuous maintenance, 
+                updates, and performance monitoring.
               </p>
             </motion.div>
           </div>
@@ -143,21 +144,21 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8 }}
         variants={fadeInUp}
-        className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 pointer-events-auto"
+        className="min-h-[80vh] flex flex-col items-center justify-center px-6 py-24 pointer-events-auto snap-section"
       >
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-6">
-            Ready to get started?
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-5xl md:text-7xl font-bold text-foreground mb-10 tracking-tighter">
+            Ready to build?
           </h2>
-          <p className="text-muted-foreground text-lg mb-8">
-            Join the enterprises already building on Morpho.
+          <p className="text-muted-foreground text-xl md:text-2xl mb-12 max-w-xl mx-auto">
+            Let's discuss how we can bring your next digital product to life.
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-accent text-accent-foreground px-8 py-4 rounded-full font-medium text-lg shadow-lg shadow-accent/20"
+            className="bg-primary text-primary-foreground px-12 py-5 rounded-full font-bold text-xl shadow-2xl shadow-primary/20 hover:bg-primary/90 transition-colors"
           >
-            Launch App
+            Get a Quote
           </motion.button>
         </div>
       </motion.section>

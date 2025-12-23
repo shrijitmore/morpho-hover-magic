@@ -2,18 +2,18 @@ import { motion } from 'framer-motion';
 
 // Sample partner logos - using colored circles with initials as placeholders
 const partners = [
-  { id: 1, name: 'Safe', color: '#10B981', x: 15, y: 20 },
-  { id: 2, name: 'Ledger', color: '#6366F1', x: 75, y: 15 },
-  { id: 3, name: 'Coinbase', color: '#3B82F6', x: 85, y: 45 },
-  { id: 4, name: 'Gemini', color: '#06B6D4', x: 20, y: 55 },
-  { id: 5, name: 'Trust', color: '#22C55E', x: 35, y: 30 },
-  { id: 6, name: 'Robinhood', color: '#F59E0B', x: 65, y: 35 },
-  { id: 7, name: 'Block', color: '#10B981', x: 45, y: 65 },
-  { id: 8, name: 'Circle', color: '#8B5CF6', x: 80, y: 70 },
-  { id: 9, name: 'Lemon', color: '#EF4444', x: 25, y: 75 },
-  { id: 10, name: 'Bitpanda', color: '#14B8A6', x: 55, y: 55 },
-  { id: 11, name: 'MEV', color: '#6B7280', x: 90, y: 60 },
-  { id: 12, name: 'Frax', color: '#1F2937', x: 10, y: 40 },
+  { id: 1, name: 'React', color: '#61DAFB', x: 15, y: 20 },
+  { id: 2, name: 'Node.js', color: '#339933', x: 75, y: 15 },
+  { id: 3, name: 'Flutter', color: '#02569B', x: 85, y: 45 },
+  { id: 4, name: 'TypeScript', color: '#3178C6', x: 20, y: 55 },
+  { id: 5, name: 'Next.js', color: '#FFFFFF', x: 35, y: 30 },
+  { id: 6, name: 'Tailwind', color: '#06B6D4', x: 65, y: 35 },
+  { id: 7, name: 'Firebase', color: '#FFCA28', x: 45, y: 65 },
+  { id: 8, name: 'Python', color: '#3776AB', x: 80, y: 70 },
+  { id: 9, name: 'AWS', color: '#FF9900', x: 25, y: 75 },
+  { id: 10, name: 'GraphQL', color: '#E10098', x: 55, y: 55 },
+  { id: 11, name: 'Docker', color: '#2496ED', x: 90, y: 60 },
+  { id: 12, name: 'PostgreSQL', color: '#4169E1', x: 10, y: 40 },
 ];
 
 interface FloatingLogosProps {

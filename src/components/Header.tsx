@@ -4,10 +4,10 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { label: 'Products', hasDropdown: true },
-  { label: 'Solutions', hasDropdown: true },
-  { label: 'Customers', hasDropdown: false },
-  { label: 'Resources', hasDropdown: true },
+  { label: 'Services', hasDropdown: true },
+  { label: 'Portfolio', hasDropdown: false },
+  { label: 'Our Process', hasDropdown: false },
+  { label: 'About', hasDropdown: false },
   { label: 'Contact', hasDropdown: false },
 ];
 
@@ -30,18 +30,17 @@ export default function Header() {
                 d="M16 4L4 10v12l12 6 12-6V10L16 4z"
                 stroke="currentColor"
                 strokeWidth="2"
-                className="text-foreground"
+                className="text-primary"
               />
               <path
                 d="M16 4v12m0 0l12-6m-12 6L4 10m12 6v12"
                 stroke="currentColor"
                 strokeWidth="2"
-                className="text-foreground"
+                className="text-primary"
               />
             </svg>
           </div>
-          <span className="text-xl font-semibold text-foreground">Morpho</span>
-          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          <span className="text-xl font-bold tracking-tighter text-foreground">NOVA DEV</span>
         </div>
 
         {/* Desktop Navigation */}
@@ -49,7 +48,7 @@ export default function Header() {
           {navItems.map((item) => (
             <button
               key={item.label}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               {item.label}
               {item.hasDropdown && <ChevronDown className="w-3 h-3" />}
@@ -59,8 +58,8 @@ export default function Header() {
 
         {/* CTA Button */}
         <div className="hidden lg:block">
-          <Button variant="cta" size="lg">
-            Launch App
+          <Button variant="outline" className="rounded-full border-primary/50 hover:bg-primary/10">
+            Start a Project
           </Button>
         </div>
 
@@ -90,8 +89,8 @@ export default function Header() {
                 {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
               </button>
             ))}
-            <Button variant="cta" className="mt-4 w-full">
-              Launch App
+            <Button variant="outline" className="mt-4 w-full rounded-full border-primary/50 hover:bg-primary/10">
+              Start a Project
             </Button>
           </nav>
         </motion.div>
