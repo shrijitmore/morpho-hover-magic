@@ -43,16 +43,8 @@ const Index = () => {
     };
   }, []);
 
-  // Calculate background fade based on scroll
-  const bgOpacity = Math.min(1, scrollProgress * 2);
-
   return (
     <div className="relative w-full min-h-screen bg-background overflow-x-hidden">
-      {/* Scroll-based background fade overlay */}
-      <div 
-        className="fixed inset-0 bg-gradient-to-b from-background via-background to-black pointer-events-none z-0 transition-opacity duration-300"
-        style={{ opacity: bgOpacity }}
-      />
 
       {/* Fixed 3D Scene */}
       <Scene scrollProgress={scrollProgress} />
