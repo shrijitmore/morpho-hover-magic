@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HeroContentProps {
   scrollProgress?: number;
@@ -13,60 +13,61 @@ export default function HeroContent({ scrollProgress = 0 }: HeroContentProps) {
       className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-10"
       style={{ opacity }}
     >
+      {/* Background text watermark */}
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.03]">
+        <span className="text-[20vw] font-display font-bold tracking-tighter whitespace-nowrap select-none">
+          ORANGEGLAZZ
+        </span>
+      </div>
+
       {/* Main headline */}
       <motion.h1
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tighter mb-6 text-center px-4"
+        className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-foreground tracking-tight mb-6 text-center px-4"
       >
-        We build the digital
+        Building <span className="italic text-gradient">Digital</span>
         <br />
-        products of tomorrow
+        <span className="italic text-gradient">Solutions</span> That Matter
       </motion.h1>
 
-      {/* Subtitle */}
-      <motion.p
+      {/* Subtitle - positioned bottom left */}
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-        className="text-muted-foreground text-lg md:text-xl text-center max-w-2xl px-4 mb-12 leading-relaxed"
+        className="absolute bottom-28 left-6 lg:left-12 max-w-md text-left pointer-events-auto"
       >
-        Nova Dev is a freelance agency specializing in high-performance
-        <br className="hidden md:block" /> web applications and custom mobile experiences.
-      </motion.p>
+        <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6">
+          We empower businesses with digital solutions that turn complex challenges into real-world outcomes.
+        </p>
+        <Button 
+          className="rounded-full bg-primary/20 border border-primary/30 text-foreground hover:bg-primary/30 px-8 py-6 text-base font-medium"
+        >
+          Start Your Project
+        </Button>
+      </motion.div>
 
-      {/* Stats */}
+      {/* Stats - positioned bottom right */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
-        className="absolute bottom-12 left-12 flex gap-16"
+        className="absolute bottom-28 right-6 lg:right-12 flex gap-10 lg:gap-16"
       >
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2 font-bold">Launched</p>
-          <p className="text-foreground font-mono text-2xl md:text-3xl">42+</p>
+        <div className="text-right">
+          <p className="text-foreground font-display text-3xl md:text-4xl font-bold">50+</p>
+          <p className="text-muted-foreground text-xs uppercase tracking-wider mt-1">Projects<br />Delivered</p>
         </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2 font-bold">Satisfaction</p>
-          <p className="text-foreground font-mono text-2xl md:text-3xl">100%</p>
+        <div className="text-right">
+          <p className="text-foreground font-display text-3xl md:text-4xl font-bold">100%</p>
+          <p className="text-muted-foreground text-xs uppercase tracking-wider mt-1">Client<br />Satisfaction</p>
         </div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.2 }}
-        className="absolute bottom-8 right-8 flex items-center gap-2 text-muted-foreground text-sm"
-      >
-        <span>Scroll to explore</span>
-        <motion.div
-          animate={{ y: [0, 4, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <ChevronDown className="w-4 h-4" />
-        </motion.div>
+        <div className="text-right">
+          <p className="text-foreground font-display text-3xl md:text-4xl font-bold">24/7</p>
+          <p className="text-muted-foreground text-xs uppercase tracking-wider mt-1">Support<br />Available</p>
+        </div>
       </motion.div>
     </div>
   );
