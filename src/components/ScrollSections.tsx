@@ -405,74 +405,213 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8 }}
-        className="min-h-[80vh] flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto relative"
+        className="min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto relative overflow-hidden"
       >
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2 
-            className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-foreground mb-10 tracking-tight"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            We turn bold ideas into
-            <br />
-            <span className="text-gradient italic">powerful digital realities.</span>
-          </motion.h2>
-          <motion.button
+        {/* Background glow effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[150px]"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-accent/10 blur-[120px]"
+            animate={{ 
+              x: [-100, 100, -100],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ 
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-primary text-primary-foreground px-12 py-5 rounded-full font-medium text-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
+            transition={{ duration: 0.5 }}
+            className="text-primary text-sm uppercase tracking-[0.3em] mb-8 font-medium"
           >
-            Let's work together
-          </motion.button>
+            Ready to start?
+          </motion.p>
+          
+          <motion.h2 
+            className="text-5xl md:text-6xl lg:text-8xl font-display font-bold text-foreground mb-12 tracking-tight leading-[1.1]"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            We turn bold ideas into
+            <br />
+            <motion.span 
+              className="text-gradient italic inline-block"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              powerful digital realities.
+            </motion.span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-12"
+          >
+            Partner with Orangeglazz to bring your vision to life. Let's create something extraordinary together.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0 0 40px hsl(var(--primary) / 0.4)" }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-primary text-primary-foreground px-10 py-5 rounded-full font-medium text-lg transition-all shadow-lg shadow-primary/30"
+            >
+              Start Your Project
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className="border border-border/50 text-foreground px-10 py-5 rounded-full font-medium text-lg hover:bg-muted/20 hover:border-primary/30 transition-all"
+            >
+              View Our Work
+            </motion.button>
+          </motion.div>
         </div>
       </motion.section>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 px-6 lg:px-12 py-16 pointer-events-auto">
-        <div className="max-w-7xl mx-auto">
+      <footer className="relative border-t border-border/20 px-6 lg:px-12 py-20 pointer-events-auto overflow-hidden">
+        {/* Footer background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Top section with large branding */}
+          <motion.div 
+            className="mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h3 className="text-5xl md:text-7xl font-display font-bold text-foreground mb-6 uppercase tracking-wider">
+              Orangeglazz
+            </h3>
+            <p className="text-muted-foreground text-lg max-w-md">
+              Transforming ideas into digital excellence. Your vision, our expertise.
+            </p>
+          </motion.div>
+
           <div className="grid md:grid-cols-4 gap-12 mb-16">
-            <div className="md:col-span-2">
-              <h3 className="text-xl font-display font-bold text-foreground mb-4 uppercase tracking-wider">Orangeglazz</h3>
-              <p className="text-muted-foreground text-sm mb-4">hello@orangeglazz.com</p>
-              <div className="flex gap-4 text-muted-foreground text-sm">
+            <motion.div 
+              className="md:col-span-2"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <h4 className="text-sm uppercase tracking-wider text-primary mb-4">Get in touch</h4>
+              <a href="mailto:hello@orangeglazz.com" className="text-2xl md:text-3xl font-display text-foreground hover:text-primary transition-colors">
+                hello@orangeglazz.com
+              </a>
+              <div className="flex gap-4 text-muted-foreground text-sm mt-6">
                 <span>Based globally</span>
                 <span>•</span>
                 <span>Serving clients worldwide</span>
               </div>
-            </div>
-            <div>
-              <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Services</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Product Design</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Development</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Digital Marketing</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Garai AI</a></li>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h4 className="text-sm uppercase tracking-wider text-primary mb-6">Services</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Product Design</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Development</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Digital Marketing</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Garai AI</a></li>
               </ul>
-            </div>
-            <div>
-              <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">About Us</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Our Work</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Careers</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors">Contact</a></li>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <h4 className="text-sm uppercase tracking-wider text-primary mb-6">Company</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">About Us</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Our Work</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Careers</a></li>
+                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Contact</a></li>
               </ul>
-            </div>
+            </motion.div>
           </div>
-          <div className="pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4">
+          
+          <motion.div 
+            className="pt-8 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <p className="text-muted-foreground text-sm">© 2025 Orangeglazz. All rights reserved.</p>
-            <div className="flex gap-6">
-              <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">LinkedIn</a>
-              <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Twitter</a>
-              <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Instagram</a>
+            <div className="flex gap-8">
+              <motion.a 
+                href="#" 
+                className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                whileHover={{ y: -2 }}
+              >
+                LinkedIn
+              </motion.a>
+              <motion.a 
+                href="#" 
+                className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                whileHover={{ y: -2 }}
+              >
+                Twitter
+              </motion.a>
+              <motion.a 
+                href="#" 
+                className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                whileHover={{ y: -2 }}
+              >
+                Instagram
+              </motion.a>
+              <motion.a 
+                href="#" 
+                className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                whileHover={{ y: -2 }}
+              >
+                Dribbble
+              </motion.a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </footer>
     </div>
