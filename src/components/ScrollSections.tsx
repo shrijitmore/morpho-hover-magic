@@ -56,18 +56,6 @@ const caseStudies = [
     tags: ['Web Design', 'Development'],
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop',
   },
-  {
-    number: '04',
-    title: 'CloudSync Platform',
-    tags: ['App Design', 'AI Development'],
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
-  },
-  {
-    number: '05',
-    title: 'RetailMax Store',
-    tags: ['E-commerce', 'Digital Marketing'],
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop',
-  },
 ];
 
 const testimonials = [
@@ -98,183 +86,63 @@ interface ScrollSectionsProps {
 
 export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const servicesRef = useRef<HTMLDivElement>(null);
-  const caseStudiesRef = useRef<HTMLDivElement>(null);
-  const horizontalRef = useRef<HTMLDivElement>(null);
-  const testimonialsRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const spotlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Spotlight/mask background animation
-      if (spotlightRef.current) {
-        gsap.to(spotlightRef.current, {
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1,
-          },
-          backgroundPosition: "50% 100%",
-          opacity: 1,
-        });
-      }
-
-      // Services section - stacked pinned cards
-      if (servicesRef.current) {
-        const cards = servicesRef.current.querySelectorAll('.service-card');
-        
-        cards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { 
-              y: 100 + (i * 20), 
-              opacity: 0,
-              scale: 0.9,
-              filter: "blur(10px)"
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 85%",
-                end: "top 40%",
-                scrub: 1,
-              }
-            }
-          );
-
-          // Parallax on scroll out
-          gsap.to(card, {
-            y: -50 - (i * 10),
-            opacity: 0.6,
-            scale: 0.95,
+      // Simple fade-in animations for each section
+      gsap.utils.toArray('.scroll-section').forEach((section: any) => {
+        gsap.fromTo(section,
+          { opacity: 0, y: 60 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
             scrollTrigger: {
-              trigger: card,
-              start: "bottom 50%",
-              end: "bottom -20%",
+              trigger: section,
+              start: "top 80%",
+              end: "top 40%",
               scrub: 1,
             }
-          });
-        });
-      }
-
-      // Case studies - horizontal scroll scrub
-      if (caseStudiesRef.current && horizontalRef.current) {
-        const scrollWidth = horizontalRef.current.scrollWidth - window.innerWidth + 200;
-        
-        gsap.to(horizontalRef.current, {
-          x: -scrollWidth,
-          ease: "none",
-          scrollTrigger: {
-            trigger: caseStudiesRef.current,
-            start: "top top",
-            end: () => `+=${scrollWidth}`,
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
           }
-        });
+        );
+      });
 
-        // Individual card animations
-        const caseCards = horizontalRef.current.querySelectorAll('.case-card');
-        caseCards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { opacity: 0.3, scale: 0.85, rotateY: -15 },
-            {
-              opacity: 1,
-              scale: 1,
-              rotateY: 0,
-              scrollTrigger: {
-                trigger: caseStudiesRef.current,
-                start: `top+=${i * 200} top`,
-                end: `top+=${i * 200 + 400} top`,
-                scrub: 1,
-              }
+      // Card stagger animations
+      gsap.utils.toArray('.animate-card').forEach((card: any, i) => {
+        gsap.fromTo(card,
+          { opacity: 0, y: 40, scale: 0.95 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              end: "top 60%",
+              scrub: 1,
             }
-          );
-        });
-      }
-
-      // Testimonials - parallax reveal with stagger
-      if (testimonialsRef.current) {
-        const testimonialCards = testimonialsRef.current.querySelectorAll('.testimonial-card');
-        
-        testimonialCards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { 
-              y: 150, 
-              opacity: 0, 
-              rotateX: 15,
-              filter: "blur(8px)"
-            },
-            {
-              y: 0,
-              opacity: 1,
-              rotateX: 0,
-              filter: "blur(0px)",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 90%",
-                end: "top 50%",
-                scrub: 1,
-              }
-            }
-          );
-        });
-      }
-
-      // CTA section - dramatic reveal
-      if (ctaRef.current) {
-        const ctaElements = ctaRef.current.querySelectorAll('.cta-element');
-        
-        ctaElements.forEach((el, i) => {
-          gsap.fromTo(el,
-            { 
-              y: 80 + (i * 20), 
-              opacity: 0,
-              scale: 0.9
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              scrollTrigger: {
-                trigger: ctaRef.current,
-                start: `top+=${i * 50} 80%`,
-                end: `top+=${i * 50 + 200} 40%`,
-                scrub: 1,
-              }
-            }
-          );
-        });
-      }
+          }
+        );
+      });
 
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
+  // Background fade based on scroll
+  const bgOpacity = Math.min(scrollProgress * 2, 0.9);
+
   return (
     <div ref={containerRef} className="relative z-20 pt-[100vh]">
-      {/* Spotlight/mask background fade */}
+      {/* Background fade overlay */}
       <div 
-        ref={spotlightRef}
-        className="fixed inset-0 pointer-events-none z-10 opacity-0"
-        style={{
-          background: `radial-gradient(ellipse 80% 60% at 50% 0%, transparent 0%, hsl(var(--background)) 70%)`,
-          backgroundPosition: "50% 0%",
-        }}
+        className="fixed inset-0 pointer-events-none z-10 bg-background"
+        style={{ opacity: bgOpacity }}
       />
 
-      {/* Services Section - Stacked Cards */}
-      <section
-        ref={servicesRef}
-        className="min-h-screen flex flex-col items-center justify-start px-6 lg:px-12 py-24 pointer-events-auto relative"
-      >
+      {/* Services Section */}
+      <section className="scroll-section min-h-screen flex flex-col items-center justify-start px-6 lg:px-12 py-24 pointer-events-auto relative z-20">
         <div className="max-w-7xl mx-auto w-full">
           <div className="mb-16">
             <p className="text-primary text-sm uppercase tracking-[0.2em] mb-4 font-medium">Our Services</p>
@@ -283,14 +151,12 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6" style={{ perspective: "1000px" }}>
-            {services.map((service, idx) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {services.map((service) => (
               <div
                 key={service.number}
-                className="service-card group bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl p-8 hover:border-primary/50 hover:bg-card/60 transition-all duration-500 cursor-pointer relative overflow-hidden"
-                style={{ transformStyle: "preserve-3d" }}
+                className="animate-card group bg-card/40 backdrop-blur-md border border-border/40 rounded-3xl p-8 hover:border-primary/50 hover:bg-card/60 transition-all duration-500 cursor-pointer relative overflow-hidden"
               >
-                {/* Hover glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <div className="relative z-10">
@@ -311,7 +177,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
                         {service.services.map((s) => (
                           <span 
                             key={s} 
-                            className="text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border/30 hover:border-primary/30 hover:text-foreground transition-all duration-300"
+                            className="text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border/30"
                           >
                             {s}
                           </span>
@@ -340,79 +206,61 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         </div>
       </section>
 
-      {/* Case Studies Section - Horizontal Scroll */}
-      <section 
-        ref={caseStudiesRef}
-        className="h-screen pointer-events-auto overflow-hidden relative"
-      >
-        <div className="absolute top-0 left-0 px-6 lg:px-12 pt-24 z-20">
-          <div className="max-w-7xl">
+      {/* Case Studies Section */}
+      <section className="scroll-section min-h-screen flex flex-col items-center justify-start px-6 lg:px-12 py-24 pointer-events-auto relative z-20">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="mb-16">
             <p className="text-primary text-sm uppercase tracking-[0.2em] mb-4 font-medium">Case Studies</p>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground tracking-tight max-w-3xl leading-tight">
               Proven results, measurable impact.
             </h2>
           </div>
-        </div>
 
-        {/* Horizontal Scroll Container */}
-        <div 
-          ref={horizontalRef}
-          className="flex items-center gap-8 px-6 lg:px-12 h-full pt-32"
-          style={{ width: "fit-content" }}
-        >
-          {caseStudies.map((study, idx) => (
-            <div
-              key={study.number}
-              className="case-card group relative min-w-[350px] md:min-w-[450px] lg:min-w-[550px] h-[400px] md:h-[500px] rounded-3xl overflow-hidden cursor-pointer flex-shrink-0"
-              style={{ perspective: "1000px" }}
-            >
-              {/* Background Image */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${study.image})` }}
-              />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-              
-              {/* Content */}
-              <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                <span className="text-primary text-sm font-mono self-start bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
-                  {study.number}
-                </span>
+          <div className="grid md:grid-cols-3 gap-6">
+            {caseStudies.map((study) => (
+              <div
+                key={study.number}
+                className="animate-card group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  style={{ backgroundImage: `url(${study.image})` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 
-                <div>
-                  <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">
-                    {study.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {study.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs text-white/80 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                  <span className="text-primary text-sm font-mono self-start bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
+                    {study.number}
+                  </span>
+                  
+                  <div>
+                    <h3 className="text-2xl font-display font-bold text-white mb-4">
+                      {study.title}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {study.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs text-white/80 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Hover Arrow */}
-              <div className="absolute top-8 right-8 w-12 h-12 bg-primary rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-45">
-                <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
+                <div className="absolute top-8 right-8 w-12 h-12 bg-primary rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-45">
+                  <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Testimonials Section - Parallax Reveal */}
-      <section
-        ref={testimonialsRef}
-        className="min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto"
-        style={{ perspective: "1000px" }}
-      >
+      {/* Testimonials Section */}
+      <section className="scroll-section min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto relative z-20">
         <div className="max-w-7xl mx-auto w-full">
           <div className="mb-16 text-center">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground tracking-tight">
@@ -426,10 +274,9 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
             {testimonials.map((testimonial, idx) => (
               <div
                 key={idx}
-                className="testimonial-card group bg-card/30 border border-border/30 rounded-3xl p-8 hover:border-primary/30 hover:bg-card/50 transition-all duration-500"
-                style={{ transformStyle: "preserve-3d" }}
+                className="animate-card group bg-card/30 border border-border/30 rounded-3xl p-8 hover:border-primary/30 hover:bg-card/50 transition-all duration-500"
               >
-                <p className="text-foreground text-lg leading-relaxed mb-8 group-hover:text-foreground/90 transition-colors">
+                <p className="text-foreground text-lg leading-relaxed mb-8">
                   "{testimonial.quote}"
                 </p>
                 <div>
@@ -443,14 +290,12 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
       </section>
 
       {/* Trusted By Section */}
-      <section className="py-24 px-6 lg:px-12 pointer-events-auto">
+      <section className="scroll-section py-24 px-6 lg:px-12 pointer-events-auto relative z-20">
         <div className="max-w-7xl mx-auto text-center">
-          <div>
-            <p className="text-primary text-sm uppercase tracking-[0.2em] mb-4 font-medium">Trusted by Industry Leaders</p>
-            <h2 className="text-2xl md:text-3xl font-display font-medium text-muted-foreground mb-12">
-              Powering Innovation for Companies Worldwide
-            </h2>
-          </div>
+          <p className="text-primary text-sm uppercase tracking-[0.2em] mb-4 font-medium">Trusted by Industry Leaders</p>
+          <h2 className="text-2xl md:text-3xl font-display font-medium text-muted-foreground mb-12">
+            Powering Innovation for Companies Worldwide
+          </h2>
 
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {clients.map((client, idx) => (
@@ -460,8 +305,7 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                className="text-2xl md:text-3xl font-display font-bold text-muted-foreground/40 hover:text-foreground/60 transition-colors duration-300 cursor-pointer"
+                className="text-2xl font-display font-bold text-muted-foreground/40 hover:text-foreground transition-colors duration-300"
               >
                 {client}
               </motion.div>
@@ -470,100 +314,107 @@ export default function ScrollSections({ scrollProgress }: ScrollSectionsProps) 
         </div>
       </section>
 
-      {/* CTA Section - Dramatic Reveal */}
-      <section
-        ref={ctaRef}
-        className="min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto relative overflow-hidden"
-      >
-        {/* Background glow effects */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[150px] animate-pulse" />
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-accent/10 blur-[120px]" />
-        </div>
-
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <p className="cta-element text-primary text-sm uppercase tracking-[0.3em] mb-8 font-medium">
-            Ready to start?
-          </p>
+      {/* CTA Section */}
+      <section className="scroll-section min-h-screen flex flex-col items-center justify-center px-6 lg:px-12 py-24 pointer-events-auto relative z-20">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-primary text-sm uppercase tracking-[0.2em] mb-6 font-medium"
+          >
+            Ready to Start?
+          </motion.p>
           
-          <h2 className="cta-element text-5xl md:text-6xl lg:text-8xl font-display font-bold text-foreground mb-12 tracking-tight leading-[1.1]">
-            We turn bold ideas into
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-foreground tracking-tight mb-8"
+          >
+            Let's build something
             <br />
-            <span className="text-gradient italic">powerful digital realities.</span>
-          </h2>
-
-          <p className="cta-element text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-12">
-            Partner with Orangeglazz to bring your vision to life. Let's create something extraordinary together.
-          </p>
+            <span className="text-gradient italic">extraordinary</span>
+          </motion.h2>
           
-          <div className="cta-element flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="bg-primary text-primary-foreground px-10 py-5 rounded-full font-medium text-lg transition-all shadow-lg shadow-primary/30 hover:scale-105 hover:shadow-xl hover:shadow-primary/40">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-lg md:text-xl mb-12 max-w-2xl mx-auto"
+          >
+            Transform your vision into reality with our expert team of designers, developers, and strategists.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <button className="group inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium hover:bg-primary/90 transition-all duration-300 text-lg">
               Start Your Project
+              <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
             </button>
-            <button className="border border-border/50 text-foreground px-10 py-5 rounded-full font-medium text-lg hover:bg-muted/20 hover:border-primary/30 transition-all hover:scale-105">
+            <button className="inline-flex items-center justify-center gap-2 border border-border text-foreground px-8 py-4 rounded-full font-medium hover:bg-card/50 transition-all duration-300 text-lg">
               View Our Work
             </button>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative border-t border-border/20 px-6 lg:px-12 py-20 pointer-events-auto overflow-hidden">
-        {/* Footer background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Top section with large branding */}
-          <div className="mb-20">
-            <h3 className="text-5xl md:text-7xl font-display font-bold text-foreground mb-6 uppercase tracking-wider">
-              Orangeglazz
-            </h3>
-            <p className="text-muted-foreground text-lg max-w-md">
-              Transforming ideas into digital excellence. Your vision, our expertise.
-            </p>
-          </div>
-
+      <footer className="scroll-section py-24 px-6 lg:px-12 border-t border-border/30 pointer-events-auto relative z-20">
+        <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-2">
-              <h4 className="text-sm uppercase tracking-wider text-primary mb-4">Get in touch</h4>
-              <a href="mailto:hello@orangeglazz.com" className="text-2xl md:text-3xl font-display text-foreground hover:text-primary transition-colors">
-                hello@orangeglazz.com
-              </a>
-              <div className="flex gap-4 text-muted-foreground text-sm mt-6">
-                <span>Based globally</span>
-                <span>•</span>
-                <span>Serving clients worldwide</span>
-              </div>
+              <h3 className="text-3xl font-display font-bold text-foreground mb-4">ORANGEGLAZZ</h3>
+              <p className="text-muted-foreground max-w-md">
+                Empowering businesses with digital solutions that turn complex challenges into real-world outcomes.
+              </p>
             </div>
             
             <div>
-              <h4 className="text-sm uppercase tracking-wider text-primary mb-6">Services</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Product Design</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Development</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Digital Marketing</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Garai AI</a></li>
+              <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Links</h4>
+              <ul className="space-y-3">
+                {['Work', 'Services', 'About', 'Contact'].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-foreground hover:text-primary transition-colors duration-300">
+                      {link}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
             
             <div>
-              <h4 className="text-sm uppercase tracking-wider text-primary mb-6">Company</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">About Us</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Our Work</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Careers</a></li>
-                <li><a href="#" className="text-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Contact</a></li>
+              <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Connect</h4>
+              <ul className="space-y-3">
+                {['Twitter', 'LinkedIn', 'Instagram', 'Dribbble'].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-foreground hover:text-primary transition-colors duration-300">
+                      {link}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-muted-foreground text-sm">© 2025 Orangeglazz. All rights reserved.</p>
-            <div className="flex gap-8">
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">LinkedIn</a>
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">Twitter</a>
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">Instagram</a>
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">Dribbble</a>
+
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-border/30">
+            <p className="text-muted-foreground text-sm">
+              © 2024 Orangeglazz. All rights reserved.
+            </p>
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                Terms of Service
+              </a>
             </div>
           </div>
         </div>
