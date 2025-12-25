@@ -106,17 +106,17 @@ export default function ParticleCloud({
     // Generate expanded positions (scattered outward for scroll effect)
     const expandedPositionsArr = new Float32Array(count * 3);
     
-    // Generate random colors for expanded state (colorful dots like morpho)
+    // Generate random colors for expanded state (orange-themed palette)
     const expandedColorsArr = new Float32Array(count * 3);
     const colorPalette = [
-      { h: 0.55, s: 0.9, l: 0.6 },   // Cyan
-      { h: 0.33, s: 0.8, l: 0.5 },   // Green
-      { h: 0.08, s: 0.9, l: 0.55 },  // Orange
-      { h: 0.6, s: 0.7, l: 0.6 },    // Blue
-      { h: 0.0, s: 0.8, l: 0.55 },   // Red
-      { h: 0.14, s: 0.9, l: 0.55 },  // Yellow
-      { h: 0.8, s: 0.6, l: 0.6 },    // Purple
-      { h: 0, s: 0, l: 0.9 },        // White
+      { h: 0.07, s: 0.95, l: 0.55 },  // Orange (primary)
+      { h: 0.05, s: 0.9, l: 0.5 },    // Deep Orange
+      { h: 0.1, s: 0.85, l: 0.6 },    // Amber
+      { h: 0.03, s: 0.8, l: 0.45 },   // Burnt Orange
+      { h: 0.12, s: 0.9, l: 0.55 },   // Gold
+      { h: 0.0, s: 0.7, l: 0.5 },     // Red-Orange
+      { h: 0, s: 0, l: 0.95 },        // White
+      { h: 0.07, s: 0.8, l: 0.7 },    // Light Orange
     ];
 
     for (let i = 0; i < count; i++) {
@@ -226,9 +226,9 @@ export default function ParticleCloud({
     const effInteractionRadius = Math.max(0.0001, currentRadius.current * radius);
     const effDisplacement = displacement * radius;
 
-    // Colors
-    const bc = new THREE.Color().setHSL(0.55, 0.9, 0.6);
-    const hc = new THREE.Color().setHSL(0.77, 0.7, 0.6);
+    // Colors - Orange theme
+    const bc = new THREE.Color().setHSL(0.07, 0.9, 0.55);  // Orange base
+    const hc = new THREE.Color().setHSL(0.1, 0.95, 0.65);   // Amber hover
     const baseR = bc.r, baseG = bc.g, baseB = bc.b;
     const hoverR = hc.r, hoverG = hc.g, hoverB = hc.b;
 
@@ -368,10 +368,10 @@ export default function ParticleCloud({
     hitSphereRef.current.scale.setScalar(1 + scroll * 4);
   });
   
-  // Initialize colors
+  // Initialize colors - Orange theme
   const colors = useMemo(() => {
     const out = new Float32Array(particleCount * 3);
-    const color = new THREE.Color().setHSL(0.55, 0.9, 0.6);
+    const color = new THREE.Color().setHSL(0.07, 0.9, 0.55);  // Orange
     for (let i = 0; i < particleCount; i++) {
       out[i * 3] = color.r;
       out[i * 3 + 1] = color.g;
